@@ -11,7 +11,7 @@ spec:
   stages:
     - name: deploy
       spec:
-        pipeline: deploy
+        pipeline: nginx-demo-deploy
         deployment:
           app: nginx-demo
           name: staging
@@ -22,7 +22,7 @@ spec:
             value: $(inputs.imageName)
     - name: resolve-ip-address
       spec:
-        pipeline: resolve-ip-address-after-deploy
+        pipeline: nginx-demo-resolve-ip-address-after-deploy
         deployment:
           app: nginx-demo
           name: staging
@@ -31,4 +31,3 @@ spec:
   results:
     - name: ipAddress
       value: $(stages.resolve-ip-address.results.ipAddress)
-
