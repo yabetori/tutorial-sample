@@ -5,6 +5,8 @@ params:
     type: string
   - name: azureResourceGroupName
     type: string
+  - name: azureDnsZoneResourceGroupName
+    type: string
   - name: azureDnsZoneName
     type: string
   - name: azureDnsARecordName
@@ -31,14 +33,17 @@ params:
     type: string
   - name: host
     type: string
+  - name: args
+    type: array
 modules:
-  - name: github.com/qmonus/official-cloud-native-adapters
-    revision: main
-design_patterns:
+  - name: qmonus.net/adapter/official
+    revision: v0.23.0
+designPatterns:
   - pattern: qmonus.net/adapter/official/adapters/azure/container/kubernetes/apiBackend
     params:
       appName: $(params.appName)
       imageName: $(params.imageName)
+      azureDnsZoneResourceGroupName: $(params.azureDnsZoneResourceGroupName)
       azureKeyVaultKeyContainerName: $(params.azureKeyVaultKeyContainerName)
       redisPasswordSecretName: $(params.redisPasswordSecretName)
       k8sNamespace: $(params.k8sNamespace)
@@ -53,8 +58,10 @@ design_patterns:
       azureStaticIpAddress: $(params.azureStaticIpAddress)
       azureResourceGroupName: $(params.azureResourceGroupName)
       redisHost: $(params.redisHost)
+      args:
+        - $(params.args[*])
   - pattern: qmonus.net/adapter/official/pipeline/utils/pulumi:refer
-    pipeline_params:
+    pipelineParams:
       jqQueries:
         - query:
             selector: .type == "azure-native:containerregistry:Registry"
@@ -72,10 +79,6 @@ design_patterns:
             selector: .type == "azure-native:resources:ResourceGroup"
             path: .outputs.name
           name: AzureResourceGroupName
-        - query:
-            selector: .type == "azure-native:network:Zone"
-            path: .outputs.name
-          name: AzureDnsZoneName
         - query:
             selector: .type == "azure-native:network:PublicIPAddress"
             path: .outputs.ipAddress
